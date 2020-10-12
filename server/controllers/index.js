@@ -316,6 +316,9 @@ const updateDogAge = (req, res) => {
 
     // if save error, just return an error for now
     savePromise.catch((error) => res.status(500).json({ error }));
+
+    // return is required
+    return res.json({ name: doc.name, breed: doc.breed, age: newAge });
   });
 };
 
