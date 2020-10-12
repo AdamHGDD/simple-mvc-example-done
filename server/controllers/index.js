@@ -3,6 +3,7 @@ const models = require('../models');
 
 // get the Cat model
 const Cat = models.Cat.CatModel;
+const Dog = models.Dog.DogModel;
 
 // default fake data so that we have something to work with until we make a real Cat
 const defaultData = {
@@ -246,6 +247,75 @@ const notFound = (req, res) => {
   // the jade to be used as variables with #{varName}
   res.status(404).render('notFound', {
     page: req.url,
+  });
+};
+
+// New methods by Adam
+// Same as creating a new cat but now its a dog
+const setDog = (req, res) => {
+  // Check for required data
+  if (!req.body.firstname || !req.body.lastname || !req.body.breed || !req.body.age) {
+    // 400 error on fail
+    return res.status(400).json({ error: 'firstname,lastname and beds are all required' });
+  }
+
+  // Name data
+  const name = `${req.body.firstname} ${req.body.lastname}`;
+
+  // dummy JSON to insert into database
+  const dogData = {
+    name,
+    breed: req.body.breed,
+    age: req.body.age,
+  };
+
+  // create a new object
+  const newDog = new Dog(dogData);
+
+  // create new save promise for the database
+  const savePromise = newDog.save();
+
+  savePromise.then(() => {
+    // return success
+    res.json({ name: dogData.name, breed: dogData.breed, age: dogData.age });
+  });
+
+  // if error, return it
+  savePromise.catch((err) => res.status(500).json({ err }));
+
+  return res;
+};
+
+// Search for a dog and update their age
+const updateDogAge = (req, res) => {
+  // This is a POST version of the search so it goes back to .body
+  if (!req.body.name) {
+    return res.status(400).json({ error: 'Name is required to perform a search' });
+  }
+
+  // Static function
+  return Dog.findByName(req.body.name, (err, doc) => {
+    // Server error
+    if (err) {
+      return res.status(500).json({ err }); // if error, return it
+    }
+
+    // Search failed
+    if (!doc) {
+      return res.json({ error: 'No dogs found' });
+    }
+
+    // Match results in age increase
+    doc.age++;
+
+    // Save it
+    const savePromise = lastAdded.save();
+
+    // Send back found Dog
+    savePromise.then(() => res.json({ name: doc.name, breed: doc.age, age: doc.age }));
+
+    // if save error, just return an error for now
+    savePromise.catch((err) => res.status(500).json({ err }));
   });
 };
 
