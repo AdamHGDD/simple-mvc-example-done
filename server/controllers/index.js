@@ -306,16 +306,16 @@ const updateDogAge = (req, res) => {
     }
 
     // Match results in age increase
-    doc.age++;
+    let newAge = doc.age + 1;
 
     // Save it
     const savePromise = lastAdded.save();
 
     // Send back found Dog
-    savePromise.then(() => res.json({ name: doc.name, breed: doc.age, age: doc.age }));
+    savePromise.then(() => res.json({ name: doc.name, breed: doc.breed, age: newAge }));
 
     // if save error, just return an error for now
-    savePromise.catch((err) => res.status(500).json({ err }));
+    savePromise.catch((error) => res.status(500).json({ error }));
   });
 };
 
@@ -328,7 +328,9 @@ module.exports = {
   readCat,
   getName,
   setName,
+  setDog,
   updateLast,
+  updateDogAge,
   searchName,
   notFound,
 };
